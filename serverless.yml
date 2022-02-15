@@ -1,0 +1,48 @@
+service: california-housing
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  region: us-east-2
+  lambdaHashingVersion: 20201221
+
+package:
+  exclude:
+    - node_modules/**
+    - __pycache__/**
+    - (*).ipynb
+    - a/**
+functions:
+  predict-price:
+    handler: handler_function.predict
+    memorySize: 512
+    timeout: 60
+    events:
+      - http:
+          path: get-price
+          method: get
+          request:
+            parameters:
+              queryStrings:
+                medinc: true
+                houseage: true
+                aveRooms: true
+                aveBedrms: true
+                population: true
+                aveOccup: true
+                lat: true
+                long: true
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    slim: true
+    strip: false
+    useDownloadCache: true
+    use StaticCache: true
